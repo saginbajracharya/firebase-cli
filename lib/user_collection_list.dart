@@ -1,52 +1,24 @@
-import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_cli_setup/firebase_options.dart';
-import 'package:firebase_cli_setup/user_collection_list.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() async{
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await logInAnonymously();
-  runApp(const MyApp());
+class UserCollectionList extends StatefulWidget {
+  const UserCollectionList({super.key,required this.docId});
+  final dynamic docId;
+
+  @override
+  State<UserCollectionList> createState() => _UserCollectionListState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class _UserCollectionListState extends State<UserCollectionList> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter FireBase CLI',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter FireBase CLI'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('User Collection List'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        stream: FirebaseFirestore.instance.collectionGroup('users').snapshots(),
         builder:(BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -82,10 +54,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       elevation: 4,
                       child: InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => UserCollectionList(docId: snapshot.data.docs[index].id)),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(builder: (context) => const UserCollectionList()),
+                          // );
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
@@ -113,16 +85,5 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       )
     );
-  }
-}
-
-
-logInAnonymously() async {
-  try {
-    var success = await FirebaseAuth.instance.signInAnonymously();
-    log(success.toString());
-    return true;
-  } on FirebaseAuthException catch (error) {
-    log(error.toString());
   }
 }
